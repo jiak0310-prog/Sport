@@ -1,14 +1,42 @@
 
+import streamlit as st
+
 # ==========================================
-# 체대입시생을 위한 실기가이드 & 보강운동 추천
-# 고려대학교 공개 실기 기준 참고 프로그램
+# 체대입시생 실기가이드 & 보강운동 추천 앱
+# 고려대학교 2026학년도 공개 기준 참고
 # ==========================================
 
+st.set_page_config(
+    page_title="체대입시 실기가이드",
+    page_icon="🏃",
+    layout="centered"
+)
 
-# 1. 실기 점수 기준표 (리스트)
+# ------------------------------------------
+# 1. 앱 제목
+# ------------------------------------------
 
-# 10m 왕복달리기 점수표
-# 2025학년도 공개 기록표 참고
+st.title("🏃 체대입시 실기가이드")
+st.subheader("나의 실기 기록 분석 & 맞춤형 보강운동")
+
+st.write(
+    "성별과 실기 종목을 선택하고 기록을 입력하면 "
+    "실기 점수와 맞춤형 보강운동을 확인할 수 있습니다."
+)
+
+st.info(
+    "고려대학교 2026학년도 공개 실기 기준 참고 프로그램입니다. "
+    "각 종목은 서로 다른 모집단위의 기준을 사용합니다."
+)
+
+st.divider()
+
+
+# ------------------------------------------
+# 2. 실기 기준표 (리스트)
+# ------------------------------------------
+
+# 고려대 세종 국제스포츠학부 2026 기준
 score_list = [
     133, 130, 127, 124, 121,
     118, 115, 112, 109, 106,
@@ -17,15 +45,27 @@ score_list = [
     73, 70, 67, 64, 61
 ]
 
-# 남자와 여자 기록 기준 (초)
-run_male = [round(8.50 + 0.10*i, 2) for i in range(24)]
-run_female = [round(9.50 + 0.10*i, 2) for i in range(24)]
+# 10m 왕복달리기 기준
+run_male = [
+    round(8.50 + 0.10 * i, 2)
+    for i in range(24)
+]
 
-# 제자리 멀리뛰기 기준 (cm)
-jump_male = [300 - 3*i for i in range(24)]
-jump_female = [250 - 3*i for i in range(24)]
+run_female = [
+    round(9.50 + 0.10 * i, 2)
+    for i in range(24)
+]
 
-# 높이뛰기 기준 (cm)
+# 제자리 멀리뛰기 기준
+jump_male = [
+    300 - 3 * i for i in range(24)
+]
+
+jump_female = [
+    250 - 3 * i for i in range(24)
+]
+
+# 고려대 서울 체육교육과 2026 높이뛰기 기준
 height_male = [
     162, 160, 158, 156, 154, 152, 150,
     148, 146, 144, 142, 140
@@ -38,268 +78,301 @@ height_female = [
 
 height_scores = [
     100, 99, 98, 97, 96, 95, 94,
-    93, 92, 85, 78, 71, 61
+    93, 92, 85, 78, 71
+]
+
+height_grades = [
+    "A+", "A", "A-", "B+", "B", "B-",
+    "C+", "C", "C-", "D+", "D", "D-"
 ]
 
 
-# 2. 종목별 보강운동 리스트
+# ------------------------------------------
+# 3. 보강운동 자료 (딕셔너리와 리스트)
+# ------------------------------------------
 
 exercise_list = {
+
     "10m 왕복달리기": [
         ["사이드 스텝", "10회 x 2세트", "주 2회"],
-        ["스쿼트", "10회 x 2세트", "주 2~3회"],
+        ["스쿼트", "10회 x 2세트", "주 2회"],
         ["방향 전환 연습", "5회 x 2세트", "주 2회"],
         ["짧은 가속 달리기", "10m x 3회", "주 2회"]
     ],
 
     "제자리 멀리뛰기": [
-        ["스쿼트", "10회 x 2세트", "주 2~3회"],
-        ["글루트 브릿지", "12회 x 2세트", "주 2~3회"],
+        ["스쿼트", "10회 x 2세트", "주 2회"],
+        ["글루트 브릿지", "12회 x 2세트", "주 2회"],
         ["카프 레이즈", "12회 x 2세트", "주 2회"],
-        ["멀리뛰기 착지 연습", "5회 x 2세트", "주 2회"]
+        ["착지 자세 연습", "5회 x 2세트", "주 2회"]
     ],
 
     "높이뛰기": [
-        ["제자리 무릎 들기", "10회 x 2세트", "주 2회"],
-        ["글루트 브릿지", "12회 x 2세트", "주 2~3회"],
+        ["글루트 브릿지", "12회 x 2세트", "주 2회"],
         ["한 발 균형 잡기", "20초 x 2세트", "주 2회"],
+        ["제자리 무릎 들기", "10회 x 2세트", "주 2회"],
         ["도움닫기 리듬 연습", "5회 x 2세트", "주 2회"]
     ]
 }
 
 
-# 3. 성별 선택 함수
-
-def select_gender():
-
-    while True:
-        print("\n===== 성별 선택 =====")
-        print("1. 남자")
-        print("2. 여자")
-
-        choice = input("번호를 선택하세요: ")
-
-        if choice == "1":
-            return "남자"
-
-        elif choice == "2":
-            return "여자"
-
-        else:
-            print("잘못된 입력입니다. 다시 선택하세요.")
-
-
-# 4. 실기 종목 선택 함수
-
-def select_event():
-
-    events = [
-        "10m 왕복달리기",
-        "제자리 멀리뛰기",
-        "높이뛰기"
-    ]
-
-    while True:
-        print("\n===== 실기 종목 선택 =====")
-
-        for i in range(len(events)):
-            print(f"{i+1}. {events[i]}")
-
-        choice = input("종목 번호를 선택하세요: ")
-
-        if choice in ["1", "2", "3"]:
-            return events[int(choice)-1]
-
-        else:
-            print("1~3번 중에서 선택하세요.")
-
-
-# 5. 실기 기록 입력 함수
-
-def input_record(event):
-
-    while True:
-        try:
-            print("\n===== 실기 기록 입력 =====")
-
-            if event == "10m 왕복달리기":
-                record = float(
-                    input("10m 왕복달리기 기록(초): ")
-                )
-
-            elif event == "제자리 멀리뛰기":
-                record = float(
-                    input("제자리 멀리뛰기 기록(cm): ")
-                )
-
-            else:
-                record = float(
-                    input("높이뛰기 기록(cm): ")
-                )
-
-            if record <= 0:
-                print("0보다 큰 기록을 입력하세요.")
-                continue
-
-            return record
-
-        except ValueError:
-            print("숫자로 입력해주세요.")
-
-
-# 6. 점수 계산 함수
+# ------------------------------------------
+# 4. 점수 계산 함수
+# ------------------------------------------
 
 def calculate_score(gender, event, record):
 
     # 10m 왕복달리기
     if event == "10m 왕복달리기":
 
-        standards = run_male if gender == "남자" else run_female
+        standards = (
+            run_male if gender == "남자"
+            else run_female
+        )
 
-        for i in range(len(standards)):
+        record = round(record, 2)
+
+        for i in range(24):
 
             if record <= standards[i]:
-                return round(score_list[i] / 133 * 100, 1)
+                raw_score = score_list[i]
+                return raw_score, round(raw_score / 133 * 100, 1), None
 
-        return round(61 / 133 * 100, 1)
+        return 61, round(61 / 133 * 100, 1), None
 
     # 제자리 멀리뛰기
     elif event == "제자리 멀리뛰기":
 
-        standards = jump_male if gender == "남자" else jump_female
+        standards = (
+            jump_male if gender == "남자"
+            else jump_female
+        )
 
-        for i in range(len(standards)):
+        record = int(record)
+
+        for i in range(24):
 
             if record >= standards[i]:
-                return round(score_list[i] / 133 * 100, 1)
+                raw_score = score_list[i]
+                return raw_score, round(raw_score / 133 * 100, 1), None
 
-        return round(61 / 133 * 100, 1)
+        return 61, round(61 / 133 * 100, 1), None
 
     # 높이뛰기
     elif event == "높이뛰기":
 
-        standards = height_male if gender == "남자" else height_female
+        standards = (
+            height_male if gender == "남자"
+            else height_female
+        )
+
+        record = int(record)
 
         for i in range(len(standards)):
 
             if record >= standards[i]:
-                return height_scores[i]
+                return (
+                    height_scores[i],
+                    height_scores[i],
+                    height_grades[i]
+                )
 
-        return 61
+        return 61, 61, "E"
 
 
-# 7. 보강운동 필요 여부 판단 함수
+# ------------------------------------------
+# 5. 보강운동 판단 함수
+# ------------------------------------------
 
 def check_exercise(score):
 
     if score >= 90:
-        return "현재 기록이 우수합니다. 꾸준한 유지 운동을 추천합니다."
+        return "현재 기록이 우수합니다. 유지 운동을 추천합니다."
 
     elif score >= 85:
         return "기록이 양호합니다. 부족한 부분을 보완하세요."
 
     elif score >= 70:
-        return "기록 향상을 위해 보강운동이 필요합니다."
+        return "기록 향상을 위해 보강운동을 추천합니다."
 
     else:
-        return "기초 체력 및 종목별 기술 보강이 필요합니다."
+        return "기초 체력과 종목별 기술 보강을 추천합니다."
 
 
-# 8. 결과 출력 함수
+# ------------------------------------------
+# 6. 운동 추천 표 출력 함수
+# ------------------------------------------
 
-def show_result(gender, event, record, score):
+def show_exercise(event):
 
-    print("\n")
-    print("=" * 55)
-    print("          체대입시 실기 측정 결과")
-    print("=" * 55)
+    st.subheader("💪 맞춤형 보강운동")
 
-    print(f"성별 : {gender}")
-    print(f"실기 종목 : {event}")
-    print(f"측정 기록 : {record}")
+    data = exercise_list[event]
 
-    print("-" * 55)
+    # 표에 들어갈 자료 만들기
+    table_data = []
 
-    print(f"환산 점수 : {score}점 / 100점")
+    for exercise in data:
 
-    print("-" * 55)
+        table_data.append({
+            "운동 이름": exercise[0],
+            "횟수 및 세트": exercise[1],
+            "운동 주기": exercise[2]
+        })
 
-    print("===== 운동 능력 분석 =====")
+    st.table(table_data)
+
+
+# ------------------------------------------
+# 7. 결과 출력 함수
+# ------------------------------------------
+
+def show_result(gender, event, record):
+
+    raw_score, score, grade = calculate_score(
+        gender, event, record
+    )
+
+    st.divider()
+
+    st.header("📊 실기 측정 결과")
+
+    st.write(f"**성별:** {gender}")
+    st.write(f"**실기 종목:** {event}")
+
+    if event == "10m 왕복달리기":
+        st.write(f"**측정 기록:** {record:.2f}초")
+
+    elif event == "제자리 멀리뛰기":
+        st.write(f"**측정 기록:** {record:.0f}cm")
+
+    else:
+        st.write(f"**측정 기록:** {record:.0f}cm")
+
+    st.metric(
+        label="100점 만점 환산 점수",
+        value=f"{score}점"
+    )
+
+    if event == "높이뛰기":
+
+        st.write(f"**고려대 실기 등급:** {grade}")
+        st.write(f"**공식 기준표 배점:** {raw_score}점")
+
+    else:
+
+        st.write(f"**고려대 실기 기준표 배점:** {raw_score}점 / 133점")
+
+    st.divider()
+
+    # 운동 능력 분석
+    st.subheader("🔍 운동 능력 분석")
 
     result = check_exercise(score)
 
-    print(result)
+    if score >= 90:
+        st.success(result)
 
-    # 점수에 따라 보강운동 추천
-    if score < 85:
+    elif score >= 70:
+        st.info(result)
 
-        print("\n===== 맞춤형 보강운동 추천 =====")
+    else:
+        st.warning(result)
 
-        print("-" * 55)
+    # 보강운동 추천
+    if score < 90:
 
-        print("{:<22}{:<18}{:<12}".format(
-            "운동 이름", "횟수 및 세트", "주기"
-        ))
-
-        print("-" * 55)
-
-        # 리스트를 반복문으로 출력
-        for exercise in exercise_list[event]:
-
-            print("{:<22}{:<18}{:<12}".format(
-                exercise[0],
-                exercise[1],
-                exercise[2]
-            ))
+        show_exercise(event)
 
     else:
 
-        print("\n현재 기록을 유지할 수 있도록")
-        print("가벼운 유지 운동과 충분한 휴식을 추천합니다.")
-
-    print("=" * 55)
-
-
-# 9. 메인 실행 함수
-
-def main():
-
-    print("=" * 55)
-    print("   체대입시생을 위한 실기가이드 & 보강운동 프로그램")
-    print("                고려대학교 기준 참고")
-    print("=" * 55)
-
-    while True:
-
-        # 성별 선택
-        gender = select_gender()
-
-        # 종목 선택
-        event = select_event()
-
-        # 기록 입력
-        record = input_record(event)
-
-        # 점수 계산
-        score = calculate_score(
-            gender, event, record
+        st.write(
+            "현재 기록을 유지하기 위한 가벼운 운동과 "
+            "충분한 휴식을 추천합니다."
         )
 
-        # 결과 출력
-        show_result(
-            gender, event, record, score
-        )
-
-        # 재실행 여부
-        again = input(
-            "\n다른 종목도 측정하시겠습니까? (y/n): "
-        )
-
-        if again.lower() != "y":
-
-            print("\n프로그램을 종료합니다.")
-            break
+    st.caption(
+        "운동 횟수와 주기는 참고용이며, 개인의 체력과 "
+        "회복 상태에 따라 조절하세요."
+    )
 
 
-# 프로그램 실행
-main()
+# ------------------------------------------
+# 8. 앱 메인 화면
+# ------------------------------------------
+
+st.header("1️⃣ 기본 정보 입력")
+
+gender = st.selectbox(
+    "성별을 선택하세요.",
+    ["남자", "여자"]
+)
+
+st.header("2️⃣ 실기 종목 선택")
+
+event = st.selectbox(
+    "측정할 실기 종목을 선택하세요.",
+    [
+        "10m 왕복달리기",
+        "제자리 멀리뛰기",
+        "높이뛰기"
+    ]
+)
+
+
+# ------------------------------------------
+# 9. 종목별 기록 입력 화면
+# ------------------------------------------
+
+st.header("3️⃣ 실기 기록 입력")
+
+if event == "10m 왕복달리기":
+
+    st.caption("10m × 4 왕복달리기 기록을 입력하세요.")
+
+    record = st.number_input(
+        "기록 (초)",
+        min_value=1.0,
+        max_value=30.0,
+        value=10.0,
+        step=0.01
+    )
+
+elif event == "제자리 멀리뛰기":
+
+    record = st.number_input(
+        "기록 (cm)",
+        min_value=1.0,
+        max_value=500.0,
+        value=200.0,
+        step=1.0
+    )
+
+else:
+
+    record = st.number_input(
+        "기록 (cm)",
+        min_value=1.0,
+        max_value=250.0,
+        value=120.0,
+        step=1.0
+    )
+
+
+# ------------------------------------------
+# 10. 결과 확인 버튼
+# ------------------------------------------
+
+st.divider()
+
+if st.button("실기 점수 및 보강운동 확인하기", type="primary", use_container_width=True):
+
+    show_result(gender, event, record)
+
+st.divider()
+
+st.caption(
+    "본 프로그램은 고려대학교 2026학년도 공개 자료를 "
+    "참고한 연습용 프로그램입니다. "
+    "실제 입시 지원 전 최신 모집요강을 확인하세요."
+)
